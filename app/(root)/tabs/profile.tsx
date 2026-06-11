@@ -1,5 +1,6 @@
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import * as Application from "expo-application";
 import React from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,6 +14,8 @@ export default function ProfileScreen() {
     role: "Premium Member",
     joined: "Joined Jan 2024",
   };
+
+  const appVersion = Application.nativeApplicationVersion || "1.0.0";
 
   return (
     <SafeAreaView className="flex-1 bg-[#121315]">
@@ -88,14 +91,15 @@ export default function ProfileScreen() {
         </View>
 
         <View className="mt-6 mb-12 px-4">
-          <TouchableOpacity className="flex-row items-center justify-center bg-red-50 dark:bg-red-950/20 active:bg-red-100 py-4 rounded-2xl border border-red-100 dark:border-red-900/30">
+          <TouchableOpacity className="flex-row items-center justify-center bg-red-50 active:bg-red-100 py-4 rounded-2xl border border-red-100">
             <Ionicons name="log-out" size={20} color="#E50914" />
-            <Text className="ml-2 text-base font-semibold text-[#E50914] dark:text-red-400">
+            <Text className="ml-2 text-base font-semibold text-[#E50914]">
               Log Out
             </Text>
           </TouchableOpacity>
+
           <Text className="text-center text-xs text-slate-400 mt-4">
-            Version 1.0.0 • {user.joined}
+            Version {appVersion} • {user.joined}
           </Text>
         </View>
       </ScrollView>
@@ -103,7 +107,6 @@ export default function ProfileScreen() {
   );
 }
 
-// Reusable Menu Item Component
 interface MenuItemProps {
   icon: React.ReactNode;
   title: string;
