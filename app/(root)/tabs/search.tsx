@@ -101,7 +101,6 @@ const SearchScreen = () => {
         </Pressable>
       </View>
 
-      {/* Results / Feedback Container */}
       <View className="flex-1 mt-6 px-1">
         <Text className="text-white text-lg font-bold mb-2">
           {searchText.length > 0 ? "Search Results" : "Discover"}

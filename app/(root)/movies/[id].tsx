@@ -1,4 +1,5 @@
 import { useMovieById } from "@/hooks/useMovies";
+import { useWishlist } from "@/hooks/useWishlist";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
 
@@ -24,6 +25,19 @@ const MovieDetailsScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const { data: movie, isLoading, isError, error } = useMovieById(id);
+
+  const { toggleWishlist, isMovieWishlisted } = useWishlist();
+
+  const isBookmarked = isMovieWishlisted(id);
+
+  const handleToggleWishlist = () => {
+    toggleWishlist({
+      id: movie.id,
+      title: movie.title,
+      poster_path: movie.poster_path,
+      vote_average: movie.vote_average,
+    });
+  };
 
   if (isLoading) {
     return (
@@ -242,10 +256,18 @@ const MovieDetailsScreen = () => {
         className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#121212] via-[#121212]/95 to-transparent px-4 pt-6"
         style={{ paddingBottom: Math.max(insets.bottom, 16) }}
       >
-        <Pressable className="bg-[#E50914] flex-row items-center justify-center py-4 rounded-xl shadow-lg active:opacity-90">
-          <Ionicons name="add" size={22} color="#ffffff" className="mr-1" />
+        <Pressable
+          className="bg-[#E50914] flex-row items-center justify-center py-4 rounded-xl shadow-lg active:opacity-90"
+          onPress={handleToggleWishlist}
+        >
+          <Ionicons
+            name={isBookmarked ? "checkmark" : "add"}
+            size={22}
+            color="#ffffff"
+            className="mr-1"
+          />
           <Text className="text-white text-base font-bold">
-            Add to Watchlist
+            {isBookmarked ? "In Watchlist" : "Add to Watchlist"}
           </Text>
         </Pressable>
       </View>

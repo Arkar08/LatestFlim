@@ -1,3 +1,4 @@
+import { useWishlist } from "@/hooks/useWishlist";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React, { useState } from "react";
 import {
@@ -10,47 +11,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const MOVIES_DATA = [
-  {
-    id: "1",
-    title: "Interstellar",
-    year: "2014",
-    duration: "2h 49m",
-    rating: "8.6",
-    image:
-      "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=300&auto=format&fit=crop",
-  },
-  {
-    id: "2",
-    title: "Inception",
-    year: "2010",
-    duration: "2h 28m",
-    rating: "8.8",
-    image:
-      "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=300&auto=format&fit=crop",
-  },
-  {
-    id: "3",
-    title: "The Prestige",
-    year: "2006",
-    duration: "2h 10m",
-    rating: "8.5",
-    image:
-      "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=300&auto=format&fit=crop",
-  },
-  {
-    id: "4",
-    title: "The Matrix",
-    year: "1999",
-    duration: "2h 16m",
-    rating: "8.7",
-    image:
-      "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=300&auto=format&fit=crop",
-  },
-];
-
 export default function WatchlistScreen() {
   const [activeTab, setActiveTab] = useState<"movies" | "tv">("movies");
+
+  const { wishlist, toggleWishlist } = useWishlist();
+
+  const displayedItems = activeTab === "movies" ? wishlist : [];
 
   return (
     <SafeAreaView className="flex-1 bg-[#121315]">
@@ -97,40 +63,56 @@ export default function WatchlistScreen() {
         className="flex-1 px-4 mt-2"
         showsVerticalScrollIndicator={false}
       >
-        {MOVIES_DATA.map((item) => (
-          <View key={item.id} className="flex-row items-center mb-6">
-            <Image
-              source={{ uri: item.image }}
-              className="w-20 h-28 rounded-xl bg-[#232528]"
-              resizeMode="cover"
-            />
-
-            <View className="flex-1 ml-4 justify-center">
-              <Text
-                className="text-white text-lg font-bold mb-1"
-                numberOfLines={1}
-              >
-                {item.title}
-              </Text>
-              <Text className="text-[#9CA3AF] text-sm mb-2">
-                {item.year} • {item.duration}
-              </Text>
-              <View className="flex-row items-center">
-                <Text className="text-white ml-1.5 font-bold text-sm">
-                  ⭐{item.rating}
-                </Text>
-              </View>
-            </View>
-
-            <TouchableOpacity className="p-2">
-              <Ionicons
-                name="ellipsis-vertical-outline"
-                size={24}
-                color="#838383"
-              />
-            </TouchableOpacity>
+        {displayedItems.length === 0 ? (
+          <View className="flex-1 items-center justify-center pt-20">
+            <Ionicons name="film-outline" size={64} color="#4B5563" />
+            <Text className="text-gray-400 text-lg font-medium mt-4">
+              Your watchlist is empty
+            </Text>
+            <Text className="text-gray-500 text-sm text-center mt-1 px-8">
+              Tap the bookmark icon on movie details to save items for later.
+            </Text>
           </View>
-        ))}
+        ) : (
+          displayedItems.map((item: any) => {
+            const imageUrl = `https://image.tmdb.org/t/p/w300${item.poster_path}`;
+
+            return (
+              <View key={item.id} className="flex-row items-center mb-6">
+                <Image
+                  source={{ uri: imageUrl }}
+                  className="w-20 h-28 rounded-xl bg-[#232528]"
+                  resizeMode="cover"
+                ></Image>
+
+                <View className="flex-1 ml-4 justify-center">
+                  <Text
+                    className="text-white text-lg font-bold mb-1"
+                    numberOfLines={1}
+                  >
+                    {item.title}
+                  </Text>
+
+                  <Text className="text-[#9CA3AF] text-sm mb-2">Movie</Text>
+
+                  <View className="flex-row items-center">
+                    <Ionicons name="star" size={14} color="#FFD700" />
+                    <Text className="text-white ml-1.5 font-bold text-sm">
+                      {item.vote_average?.toFixed(1) || "N/A"}
+                    </Text>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  className="p-2 hit-slop"
+                  onPress={() => toggleWishlist(item)}
+                >
+                  <Ionicons name="trash-outline" size={22} color="#EF4444" />
+                </TouchableOpacity>
+              </View>
+            );
+          })
+        )}
       </ScrollView>
     </SafeAreaView>
   );

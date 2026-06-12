@@ -1,6 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Application from "expo-application";
+import { router } from "expo-router";
 import React from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,6 +17,22 @@ export default function ProfileScreen() {
   };
 
   const appVersion = Application.nativeApplicationVersion || "1.0.0";
+
+  const personalClick = () => {
+    router.push("/tabs/profile/personalInformation");
+  };
+
+  const bookmarksClick = () => {
+    router.push("/tabs/profile/bookmarks");
+  };
+
+  const notiClick = () => {
+    router.push("/tabs/profile/notification");
+  };
+
+  const settingClick = () => {
+    router.push("/tabs/profile/settings");
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-[#121315]">
@@ -73,18 +90,22 @@ export default function ProfileScreen() {
             <ProfileMenuItem
               icon={<Ionicons name="person" size={20} color="blue" />}
               title="Personal Information"
+              click={personalClick}
             />
             <ProfileMenuItem
               icon={<Ionicons name="bookmark" size={20} color="yellow" />}
               title="BookMark"
+              click={bookmarksClick}
             />
             <ProfileMenuItem
               icon={<Ionicons name="notifications" size={20} color="#ffffff" />}
               title="Notifications"
+              click={notiClick}
             />
             <ProfileMenuItem
               icon={<Ionicons name="settings" size={20} color="#838383" />}
               title="Settings"
+              click={settingClick}
               isLast
             />
           </View>
@@ -112,14 +133,22 @@ interface MenuItemProps {
   title: string;
   tag?: string;
   isLast?: boolean;
+  click: () => void;
 }
 
-function ProfileMenuItem({ icon, title, tag, isLast = false }: MenuItemProps) {
+function ProfileMenuItem({
+  icon,
+  title,
+  tag,
+  isLast = false,
+  click,
+}: MenuItemProps) {
   return (
     <TouchableOpacity
       className={`flex-row items-center justify-between p-4 active:bg-slate-50 dark:active:bg-slate-700/50 ${
         !isLast ? "border-b border-slate-50 dark:border-slate-700/50" : ""
       }`}
+      onPress={() => click()}
     >
       <View className="flex-row items-center space-x-3">
         {icon}
