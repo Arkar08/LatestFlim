@@ -1,13 +1,13 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-    Image,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -29,8 +29,8 @@ export default function PersonalInformationScreen() {
         showsVerticalScrollIndicator={false}
         className="flex-1 px-4 pt-6"
       >
-        <div className="items-center mb-8">
-          <div className="relative">
+        <View className="items-center mb-8">
+          <View className="relative">
             <Image
               source={{
                 uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
@@ -40,11 +40,11 @@ export default function PersonalInformationScreen() {
             <TouchableOpacity className="absolute bottom-0 right-0 bg-[#E50914] p-2 rounded-full border border-[#121315]">
               <Ionicons name="camera" size={16} color="white" />
             </TouchableOpacity>
-          </div>
+          </View>
           <Text className="text-xs text-slate-400 mt-2">
             Tap icon to update image
           </Text>
-        </div>
+        </View>
 
         <View className="space-y-5">
           <View>

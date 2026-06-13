@@ -2,7 +2,7 @@ import Carousel from "@/components/carousel";
 import { useMovie } from "@/hooks/useMovies";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -140,9 +140,9 @@ const HomeScreen = () => {
           <Text className="font-bold text-3xl text-[#ffffff]">Latest</Text>
           <Text className="text-[#E50914] font-bold text-3xl">Flim</Text>
         </View>
-        <View>
+        <Pressable onPress={() => router.push("/tabs/profile/notification")}>
           <Ionicons name="notifications-outline" size={24} color="#ffffff" />
-        </View>
+        </Pressable>
       </View>
       <View className="flex-row items-center gap-3 w-full mt-4">
         <Pressable
@@ -155,9 +155,12 @@ const HomeScreen = () => {
           </Text>
         </Pressable>
 
-        <View className="p-2 border-2 border-[#838383] rounded-lg">
+        <Pressable
+          className="p-2 border-2 border-[#838383] rounded-lg"
+          onPress={() => router.push("/tabs/profile/notification")}
+        >
           <Ionicons name="list-outline" size={24} color="#ffffff" />
-        </View>
+        </Pressable>
       </View>
       <ScrollView className="flex-1 mt-2" showsVerticalScrollIndicator={false}>
         <View>{isNowPlayingSuccess && movie && <Carousel data={movie} />}</View>

@@ -3,7 +3,7 @@ import { useWishlist } from "@/hooks/useWishlist";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -28,9 +28,11 @@ const MovieDetailsScreen = () => {
 
   const { toggleWishlist, isMovieWishlisted } = useWishlist();
 
-  const isBookmarked = isMovieWishlisted(id);
+  const isBookmarked = id ? isMovieWishlisted(id) : false;
 
   const handleToggleWishlist = () => {
+    if (!movie) return;
+
     toggleWishlist({
       id: movie.id,
       title: movie.title,
@@ -39,7 +41,7 @@ const MovieDetailsScreen = () => {
     });
   };
 
-  if (isLoading) {
+  if (isLoading || !id) {
     return (
       <View className="bg-[#121212] flex-1 justify-center items-center">
         <ActivityIndicator size="large" color="#E50914" />
@@ -135,7 +137,7 @@ const MovieDetailsScreen = () => {
             <View className="flex-row items-center gap-1">
               <Ionicons name="star" size={16} color="#FFD700" />
               <Text className="text-white font-bold text-sm">
-                {movie?.vote_average.toFixed(1)}
+                {movie?.vote_average?.toFixed(1)}
               </Text>
             </View>
             <Text className="text-gray-400 font-medium text-sm">
@@ -152,7 +154,7 @@ const MovieDetailsScreen = () => {
           </View>
 
           <View className="flex-row flex-wrap gap-2 mt-4">
-            {movie?.genres.map((genre: any) => (
+            {movie?.genres?.map((genre: any) => (
               <View
                 key={genre.id}
                 className="bg-[#1a1a1a] rounded-full px-4 py-1.5 border border-gray-800/60"
