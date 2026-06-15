@@ -1,34 +1,36 @@
-import { useMovieById } from "@/hooks/useMovies";
+import { useMovie, useMovieById } from "@/hooks/useMovies";
 import { useWishlist } from "@/hooks/useWishlist";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
-
 import { useState } from "react";
 import {
   ActivityIndicator,
   Image,
   ImageBackground,
+  Modal,
   Pressable,
   ScrollView,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import { WebView } from "react-native-webview";
 
 const MovieDetailsScreen = () => {
   const insets = useSafeAreaInsets();
-
   const [book, setBook] = useState<boolean>(false);
   const { id } = useLocalSearchParams<{ id: string }>();
-
   const { data: movie, isLoading, isError, error } = useMovieById(id);
-
+  const { toggleTrailer } = useMovie();
   const { toggleWishlist, isMovieWishlisted } = useWishlist();
-
   const isBookmarked = id ? isMovieWishlisted(id) : false;
+  const [modalVisible, setModalVisible] = useState(false);
+  const [trailerKey, setTrailerKey] = useState<string | null>(null);
+  const [loadingTrailer, setLoadingTrailer] = useState(false);
 
   const handleToggleWishlist = () => {
     if (!movie) return;
@@ -39,6 +41,46 @@ const MovieDetailsScreen = () => {
       poster_path: movie.poster_path,
       vote_average: movie.vote_average,
     });
+  };
+
+  const formatRuntime = (minutes: number | undefined): string => {
+    if (!minutes) return "N/A";
+
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+
+    if (hours === 0) {
+      return `${remainingMinutes}m`;
+    }
+
+    return `${hours}h ${remainingMinutes}m`;
+  };
+
+  const handlePlayTrailer = async (movieId: number) => {
+    setLoadingTrailer(true);
+    setModalVisible(true);
+    try {
+      const list = await toggleTrailer(movieId);
+      const trailer = list?.results?.find(
+        (vid: any) => vid.type === "Trailer" && vid.site === "YouTube",
+      );
+
+      if (trailer?.key) {
+        setTrailerKey(trailer.key);
+      } else {
+        setTrailerKey(null);
+      }
+    } catch (error) {
+      console.error("Error fetching trailer:", error);
+      setTrailerKey(null);
+    } finally {
+      setLoadingTrailer(false);
+    }
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setTrailerKey(null);
   };
 
   if (isLoading || !id) {
@@ -58,19 +100,6 @@ const MovieDetailsScreen = () => {
       </View>
     );
   }
-
-  const formatRuntime = (minutes: number | undefined): string => {
-    if (!minutes) return "N/A";
-
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-
-    if (hours === 0) {
-      return `${remainingMinutes}m`;
-    }
-
-    return `${hours}h ${remainingMinutes}m`;
-  };
 
   const postedUrl = `https://image.tmdb.org/t/p/w500${movie?.poster_path}`;
 
@@ -102,14 +131,17 @@ const MovieDetailsScreen = () => {
           </SafeAreaView>
 
           <View className="px-4 pb-6 pt-20 bg-gradient-to-t from-[#121212] via-[#121212]/70 to-transparent flex-row justify-between items-end">
-            <Pressable className="w-14 h-14 bg-[#E50914] rounded-full items-center justify-center shadow-lg shadow-black/50 active:scale-95 transition-transform">
+            <TouchableOpacity
+              className="w-14 h-14 bg-[#E50914] rounded-full items-center justify-center shadow-lg shadow-black/50 active:scale-95 transition-transform"
+              onPress={() => handlePlayTrailer(movie.id)}
+            >
               <Ionicons
                 name="play"
                 size={28}
                 color="#ffffff"
                 className="ml-1"
               />
-            </Pressable>
+            </TouchableOpacity>
 
             <Pressable
               className={`w-11 h-11 border rounded-xl items-center justify-center ${
@@ -273,6 +305,50 @@ const MovieDetailsScreen = () => {
           </Text>
         </Pressable>
       </View>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View className="flex-1 bg-black/80 justify-center items-center">
+          <View className="w-full bg-[#1c1c1e] rounded-2xl overflow-hidden aspect-video relative">
+            <TouchableOpacity
+              className="absolute top-3 right-3 z-50 bg-black/50 p-2 rounded-full"
+              onPress={closeModal}
+            >
+              <Ionicons name="close" size={20} color="white" />
+            </TouchableOpacity>
+
+            {loadingTrailer ? (
+              <View className="flex-1 justify-center items-center">
+                <ActivityIndicator size="large" color="#E50914" />
+              </View>
+            ) : trailerKey ? (
+              <WebView
+                javaScriptEnabled={true}
+                domStorageEnabled={true}
+                allowsFullscreenVideo={true}
+                style={{ flex: 1, backgroundColor: "black" }}
+                allowsInlineMediaPlayback={true}
+                mediaPlaybackRequiresUserAction={false}
+                originWhitelist={["*"]}
+                source={{
+                  uri: `https://www.youtube.com/watch?v=${trailerKey}?autoplay=1&mute=0&playsinline=1&enablejsapi=1`,
+                }}
+              />
+            ) : (
+              <View className="flex-1 justify-center items-center p-6">
+                <Ionicons name="alert-circle-outline" size={40} color="gray" />
+                <Text className="text-white text-center mt-2 font-medium">
+                  Trailer not available for this movie.
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

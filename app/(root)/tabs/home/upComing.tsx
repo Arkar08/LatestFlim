@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useGenre } from "@/hooks/useGenre";
 import { useMovie } from "@/hooks/useMovies";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,

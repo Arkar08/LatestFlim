@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import Carousel from "@/components/carousel";
 import { useMovie } from "@/hooks/useMovies";
 import Ionicons from "@expo/vector-icons/Ionicons";

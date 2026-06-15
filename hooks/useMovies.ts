@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 const TMDB_BEARER_TOKEN =
@@ -83,7 +83,23 @@ const searchMovie = async (text: string) => {
   return data;
 };
 
+const postTrailer = async (id: string | number) => {
+  if (!id) return { data: [] };
+
+  const { data } = await axios.get(
+    `https://api.themoviedb.org/3/movie/${id}/videos?language=en-US`,
+    {
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${TMDB_BEARER_TOKEN}`,
+      },
+    },
+  );
+  return data;
+};
+
 export const useMovie = () => {
+  const queryClient = useQueryClient();
   const queryMovie = useQuery({
     queryKey: ["nowPlayingMovie"],
     queryFn: getNowPlayingMovie,
@@ -104,7 +120,22 @@ export const useMovie = () => {
     queryFn: getComingMovie,
   });
 
-  return { queryMovie, popularMovie, topMovie, comingMovie };
+  const toggleTrailer = useMutation({
+    mutationFn: async (id: string | number) => {
+      return await postTrailer(id);
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["CarouselMovie"], data);
+    },
+  });
+
+  return {
+    queryMovie,
+    popularMovie,
+    topMovie,
+    comingMovie,
+    toggleTrailer: toggleTrailer.mutateAsync,
+  };
 };
 
 export const useMovieById = (id: string | number) => {
