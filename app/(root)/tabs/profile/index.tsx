@@ -17,6 +17,7 @@ export default function ProfileScreen() {
   };
 
   const appVersion = Application.nativeApplicationVersion || "1.0.0";
+  const buildVersion = Application.nativeBuildVersion || 1;
 
   const personalClick = () => {
     router.push("/tabs/profile/personalInformation");
@@ -120,7 +121,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
 
           <Text className="text-center text-xs text-slate-400 mt-4">
-            Version {appVersion} • {user.joined}
+            Version {appVersion}({buildVersion}) • {user.joined}
           </Text>
         </View>
       </ScrollView>
