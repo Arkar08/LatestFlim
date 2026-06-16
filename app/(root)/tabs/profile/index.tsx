@@ -2,6 +2,7 @@ import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Application from "expo-application";
 import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import React from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -33,6 +34,15 @@ export default function ProfileScreen() {
 
   const settingClick = () => {
     router.push("/tabs/profile/settings");
+  };
+  const handleLogout = async () => {
+    try {
+      await SecureStore.deleteItemAsync("isAuthenticated");
+
+      router.replace("/(auth)/signIn");
+    } catch (error) {
+      console.error("Failed to delete authentication key:", error);
+    }
   };
 
   return (
@@ -113,7 +123,10 @@ export default function ProfileScreen() {
         </View>
 
         <View className="mt-6 mb-12 px-4">
-          <TouchableOpacity className="flex-row items-center justify-center bg-red-50 active:bg-red-100 py-4 rounded-2xl border border-red-100">
+          <TouchableOpacity
+            className="flex-row items-center justify-center bg-red-50 active:bg-red-100 py-4 rounded-2xl border border-red-100"
+            onPress={handleLogout}
+          >
             <Ionicons name="log-out" size={20} color="#E50914" />
             <Text className="ml-2 text-base font-semibold text-[#E50914]">
               Log Out
